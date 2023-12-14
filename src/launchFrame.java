@@ -11,7 +11,7 @@ import java.util.Random;
 public class launchFrame extends Frame implements MouseListener{
     public static final int WIDTH = 640;
     public static final int HEIGHT = 480;
-    private boolean run;
+    private volatile boolean run;
     private boolean bombrun;
     public static final int INITX = (int) (WIDTH/2-4.5*24);
     public static final int INITY = (int) (HEIGHT/2-4.5*24);
@@ -33,11 +33,14 @@ public class launchFrame extends Frame implements MouseListener{
         //System.out.println("鼠标dianji");
         int rx = AbsToRe_X(e.getX());
         int ry = AbsToRe_Y(e.getY());
+        Thread counter = new Thread(new time_Thread());
         System.out.println(rx+"<----->"+ry);
         if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0){
             //雷生成器
             if (!bombrun){
                 bombrun = true;
+                run = true;
+                counter.start();
                 int[] xx = new int[10];
                 int[] yy = new int[10];
                 Random random = new Random();
@@ -73,6 +76,13 @@ public class launchFrame extends Frame implements MouseListener{
                         //run = false;
                         JOptionPane.showMessageDialog(null,"You Lose");
                         tempchess.setBombtriggered(true);
+                        run = false;
+                        counter.interrupt();
+                        try {
+                            counter.join();
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         for (List<chess> y : chessX){
                             for (chess a : y){
                                 if (a.isBomb()){
@@ -80,7 +90,8 @@ public class launchFrame extends Frame implements MouseListener{
                                 }
                             }
                         }
-
+                        JOptionPane.showMessageDialog(null,"Press button to continue.");
+                        reset();
                     }
                     else {
                         tempchess.setPressed(true);
@@ -137,7 +148,7 @@ public class launchFrame extends Frame implements MouseListener{
     }
     private class time_Thread implements Runnable{
         public void run(){
-            while (true) {
+            while (run) {
                 try {
                     Thread.sleep(1000);
                     time++;
@@ -146,6 +157,14 @@ public class launchFrame extends Frame implements MouseListener{
                 }
             }
         }
+    }
+    public void reset(){
+        chessX.clear();
+        Thread render = new Thread(new paint_Thread());
+        render.start();
+        generateChess(9,9);
+        bombrun = false;
+        run =false;
     }
     public void win() {
         setSize(WIDTH, HEIGHT);
@@ -158,12 +177,8 @@ public class launchFrame extends Frame implements MouseListener{
         setTitle("Minecraft");
         setVisible(true);
         setResizable(false);
-        Thread counter = new Thread(new time_Thread());
-        counter.start();
-        Thread render = new Thread(new paint_Thread());
-        render.start();
         addMouseListener(this);
-        generateChess(9,9);
+        reset();
     }
 
     public void update(Graphics g) {

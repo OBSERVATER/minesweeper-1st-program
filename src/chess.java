@@ -64,7 +64,7 @@ public class chess extends Frame{
         //isrendered = g.drawImage(imgsafe,100,100,100,100,this);
         if (pressed){
             if (Bomb && bombtriggered){
-                System.out.println("t");
+                //System.out.println("t");
                 g.drawImage(imgbombtrigerred,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
             } else if (!bombtriggered && Bomb) {
                 g.drawImage(imgbomb,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
