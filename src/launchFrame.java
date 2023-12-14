@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -11,7 +10,7 @@ public class launchFrame extends Frame implements MouseListener{
     public static final int WIDTH = 640;
     public static final int HEIGHT = 480;
     public static final int INITX = (int) (WIDTH/2-4.5*24);
-    public static final int INITY = 40;
+    public static final int INITY = (int) (HEIGHT/2-4.5*24);
     int[][] diff = {{9,9},{16,16},{16,30}};
     private Image offscreenimage = null;
     int time = 0;
@@ -29,14 +28,19 @@ public class launchFrame extends Frame implements MouseListener{
     public void mouseClicked(MouseEvent e) throws IndexOutOfBoundsException{
         //System.out.println("鼠标dianji");
         System.out.println(AbsToRe_X(e.getX())+"<----->"+AbsToRe_Y(e.getY()));
-        if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0 && e.getButton()==MouseEvent.BUTTON1){
-            List temp = chessX.get(AbsToRe_X(e.getX()));
-            chess tempchess = (chess) temp.get(AbsToRe_Y(e.getY()));
-            if (e.getClickCount() == 1) {
-                tempchess.setIspressed(true);
-            }
-            else if (e.getClickCount()==2 && tempchess.isIspressed()){
-                System.out.println("yes");
+        if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0){
+            List<chess> temp = chessX.get(AbsToRe_X(e.getX()));
+            chess tempchess = temp.get(AbsToRe_Y(e.getY()));
+            if (e.getButton()==MouseEvent.BUTTON1 && !tempchess.isFlagged()){
+                if (e.getClickCount() >= 1) {
+                    tempchess.setPressed(true);
+                } else if (e.getClickCount() == 2 && tempchess.isPressed()) {
+                    System.out.println("yes");
+                }
+            } else if (e.getButton()==MouseEvent.BUTTON3) {
+                if (e.getClickCount() >= 1 && !tempchess.isPressed()){
+                    tempchess.setFlagged(!tempchess.isFlagged());
+                };
             }
         }
 
@@ -140,6 +144,5 @@ public class launchFrame extends Frame implements MouseListener{
     public static void main(String[] args) {
         launchFrame lr = new launchFrame();
         lr.win();
-        System.out.println(INITX);
     }
 }
