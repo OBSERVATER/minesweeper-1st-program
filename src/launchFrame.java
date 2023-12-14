@@ -4,17 +4,43 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class launchFrame extends Frame implements MouseListener{
     public static final int WIDTH = 640;
     public static final int HEIGHT = 480;
+    public static final int INITX = (int) (WIDTH/2-4.5*24);
+    public static final int INITY = 40;
+    int[][] diff = {{9,9},{16,16},{16,30}};
     private Image offscreenimage = null;
     int time = 0;
-    chess a = new chess();
+    List<List<chess>> chessX = new ArrayList<>();
+    public void generateChess(int width,int height){
+        for (int x = 0; x < width; x++){
+            List<chess> chessY = new ArrayList<>();
+            for (int y = 0; y < height ;y++){
+                chessY.add(new chess(x,y));
+            }
+            chessX.add(chessY);
+        }
+    }
     @Override
-    public void mouseClicked(MouseEvent e) {
-        System.out.println("鼠标dianji");
-        a.pressed(e.getX(),e.getY());
+    public void mouseClicked(MouseEvent e) throws IndexOutOfBoundsException{
+        //System.out.println("鼠标dianji");
+        System.out.println(AbsToRe_X(e.getX())+"<----->"+AbsToRe_Y(e.getY()));
+        if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0 && e.getButton()==MouseEvent.BUTTON1){
+            List temp = chessX.get(AbsToRe_X(e.getX()));
+            chess tempchess = (chess) temp.get(AbsToRe_Y(e.getY()));
+            if (e.getClickCount() == 1) {
+                tempchess.setIspressed(true);
+            }
+            else if (e.getClickCount()==2 && tempchess.isIspressed()){
+                System.out.println("yes");
+            }
+        }
+
+
     }
 
     @Override
@@ -37,17 +63,11 @@ public class launchFrame extends Frame implements MouseListener{
 
     }
 
-    private class time_Thread implements Runnable{
-        public void run(){
-            while (true) {
-                try {
-                    Thread.sleep(1000);
-                    time++;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    private int AbsToRe_X(int x){
+        return (x-INITX)/24;
+    }
+    private int AbsToRe_Y(int y){
+        return (y-INITY)/24;
     }
     private class paint_Thread implements Runnable{
         public void run(){
@@ -55,6 +75,18 @@ public class launchFrame extends Frame implements MouseListener{
                 try {
                     repaint();
                     Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    private class time_Thread implements Runnable{
+        public void run(){
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                    time++;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -77,6 +109,7 @@ public class launchFrame extends Frame implements MouseListener{
         Thread render = new Thread(new paint_Thread());
         render.start();
         addMouseListener(this);
+        generateChess(9,9);
     }
 
     public void update(Graphics g) {
@@ -95,11 +128,18 @@ public class launchFrame extends Frame implements MouseListener{
     public void paint(Graphics g) {
         g.setColor(Color.blue);
         g.drawString("Time: " + this.time, 10, 40);
-        a.render(g);
+        for (List<chess> y : chessX){
+            //System.out.println(y);
+            for (chess a : y){
+                a.render(g);
+                //System.out.println(a);
+            }
+        }
     }
 
     public static void main(String[] args) {
         launchFrame lr = new launchFrame();
         lr.win();
+        System.out.println(INITX);
     }
 }
