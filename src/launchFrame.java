@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -5,13 +6,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class launchFrame extends Frame implements MouseListener{
     public static final int WIDTH = 640;
     public static final int HEIGHT = 480;
+    private boolean run;
+    private boolean bombrun;
     public static final int INITX = (int) (WIDTH/2-4.5*24);
     public static final int INITY = (int) (HEIGHT/2-4.5*24);
-    int[][] diff = {{9,9},{16,16},{16,30}};
+    int[][] diff = {{9,9,10},{16,16,40},{16,30,99}};
     private Image offscreenimage = null;
     int time = 0;
     List<List<chess>> chessX = new ArrayList<>();
@@ -27,24 +31,70 @@ public class launchFrame extends Frame implements MouseListener{
     @Override
     public void mouseClicked(MouseEvent e) throws IndexOutOfBoundsException{
         //System.out.println("鼠标dianji");
-        System.out.println(AbsToRe_X(e.getX())+"<----->"+AbsToRe_Y(e.getY()));
+        int rx = AbsToRe_X(e.getX());
+        int ry = AbsToRe_Y(e.getY());
+        System.out.println(rx+"<----->"+ry);
         if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0){
+            //雷生成器
+            if (!bombrun){
+                bombrun = true;
+                int[] xx = new int[10];
+                int[] yy = new int[10];
+                Random random = new Random();
+                for (int i = 0; i<10; i++){
+                    boolean isrepeat = false;
+                    xx[i]=random.nextInt(0,9);
+                    yy[i]=random.nextInt(0,9);
+                    if (i>0) {
+                        for (int j = i-1; j >= 0; j--) {
+                            if (xx[i] == xx[j] && yy[i] == yy[j]) {
+                                System.out.println(xx[i] + "==" + xx[j]);
+                                System.out.println(yy[i] + "===" + yy[j]);
+                                isrepeat = true;
+                            }
+                        }
+                    }
+                    if (isrepeat){
+                        i--;
+                        //System.out.println("yes");
+                    }
+                }
+                for (int i = 0; i<10;i++){
+                    chessX.get(xx[i]).get(yy[i]).setBomb(true);
+                }
+            }
+            //获取相对坐标
             List<chess> temp = chessX.get(AbsToRe_X(e.getX()));
             chess tempchess = temp.get(AbsToRe_Y(e.getY()));
+            //左键单击：开雷
             if (e.getButton()==MouseEvent.BUTTON1 && !tempchess.isFlagged()){
                 if (e.getClickCount() >= 1) {
-                    tempchess.setPressed(true);
+                    if (tempchess.isBomb()) {
+                        //run = false;
+                        JOptionPane.showMessageDialog(null,"You Lose");
+                        tempchess.setBombtriggered(true);
+                        for (List<chess> y : chessX){
+                            for (chess a : y){
+                                if (a.isBomb()){
+                                    a.setPressed(true);
+                                }
+                            }
+                        }
+
+                    }
+                    else {
+                        tempchess.setPressed(true);
+                    }
                 } else if (e.getClickCount() == 2 && tempchess.isPressed()) {
                     System.out.println("yes");
                 }
+                //插旗
             } else if (e.getButton()==MouseEvent.BUTTON3) {
                 if (e.getClickCount() >= 1 && !tempchess.isPressed()){
                     tempchess.setFlagged(!tempchess.isFlagged());
-                };
+                }
             }
         }
-
-
     }
 
     @Override
