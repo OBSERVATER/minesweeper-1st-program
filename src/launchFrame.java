@@ -17,6 +17,7 @@ public class launchFrame extends Frame implements MouseListener{
     private boolean bombrun;
     public final int INITX =  (WIDTH/2-diff[DIFFICULTY][0]*12);
     public final int INITY =  (HEIGHT/2-diff[DIFFICULTY][1]*12);
+    Image icon = Toolkit.getDefaultToolkit().getImage("res/icon.png");
     private Image offscreenimage = null;
     int time = 0;
     int remaining_bomb;
@@ -304,6 +305,7 @@ public class launchFrame extends Frame implements MouseListener{
         setTitle("Minecraft");
         setVisible(true);
         setResizable(false);
+        setIconImage(icon);
         addMouseListener(this);
         reset();
     }
