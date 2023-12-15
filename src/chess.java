@@ -84,15 +84,18 @@ public class chess extends Frame{
     public void setPressed(boolean pressed) {
         this.pressed = pressed;
     }
+
     @Override
     public String toString() {
         return "chess{" +
-                "bomb=" + Bomb +
-                ", x=" + rx +
-                ", y=" + ry +
+                "flagged=" + flagged +
+                ", rx=" + rx +
+                ", ry=" + ry +
+                ", bombcount=" + bombcount +
                 '}';
     }
-    public void cross(Graphics g,int x,int y){
+
+    public void cross(Graphics g, int x, int y){
         Color c = g.getColor();
         g.setColor(Color.red);
         Graphics2D g2 = (Graphics2D) g;

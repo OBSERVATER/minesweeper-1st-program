@@ -117,12 +117,10 @@ public class launchFrame extends Frame implements MouseListener{
                             for (int j = -1; j<=1;j++){
                                 if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
                                         || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
-                                        || (i==ax && j == ay))
+                                        || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isFlagged())
                                     continue;
                                 chess dc = chessX.get(ax+i).get(ay+j);
-                                if (dc.isFlagged()) {//炸雷
-                                    continue;
-                                }else if (dc.getBombcount() == 0){
+                                if (dc.getBombcount() == 0){
                                     widen(dc);
                                 }else if (dc.isBomb()){
                                     dc.setBombtriggered(true);
@@ -133,10 +131,12 @@ public class launchFrame extends Frame implements MouseListener{
                                         throw new RuntimeException(ex);
                                     }
                                     lose();
+                                    break;
                                 }else{
                                     dc.setPressed(true);
                                 }
                             }
+                            if (!run) break;
                         }
                     }
                 }
@@ -144,8 +144,8 @@ public class launchFrame extends Frame implements MouseListener{
                 //插旗
             } else if (e.getButton()==MouseEvent.BUTTON3) {
                 if (e.getClickCount() >= 1 && !tempchess.isPressed()){
-                    bcount();
                     tempchess.setFlagged(!tempchess.isFlagged());
+                    bcount();
                 }
             }
         }
@@ -188,12 +188,13 @@ public class launchFrame extends Frame implements MouseListener{
         a.setPressed(true);
         int ax = a.getRx();
         int ay = a.getRy();
-        if (a.getBombcount() == 0 && !a.isBomb()){
+        if (a.getBombcount() == 0 && !a.isBomb() ){
             for (int i = -1; i<=1 ;i++){
                 for (int j = -1; j<=1;j++){
                     if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
                             || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
-                            || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isPressed())
+                            || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isPressed()
+                            || chessX.get(ax+i).get(ay+j).isFlagged())
                         continue;
                     widen(chessX.get(ax+i).get(ay+j));
                 }
