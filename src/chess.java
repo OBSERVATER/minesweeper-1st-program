@@ -1,11 +1,21 @@
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class chess extends Frame{
     Image imgnormal = Toolkit.getDefaultToolkit().getImage("res/normal.png");
-    Image imgsafe = Toolkit.getDefaultToolkit().getImage("res/safe0.png");
+    List<Image> imgsafei = new ArrayList<>();
+    public class addimage{
+        public addimage(){
+            for (int i = 0;i<=8;i++){
+                imgsafei.add(Toolkit.getDefaultToolkit().getImage("res/safe"+i+".png"));
+            }
+        }
+    }
     Image imgflag = Toolkit.getDefaultToolkit().getImage("res/flag1.png");
     Image imgbomb = Toolkit.getDefaultToolkit().getImage("res/mine1.png");
     Image imgbombtrigerred = Toolkit.getDefaultToolkit().getImage("res/mine2.png");
-    public static final int DIFFICULTY = 2;//改变难度(0-2)-2
+    public static final int DIFFICULTY = 0;//改变难度(0-2)-2
 
     int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
     public final int INITX = (int) (800/2-diff[DIFFICULTY][0]*12);
@@ -17,15 +27,41 @@ public class chess extends Frame{
 
     private boolean flagged = false;
     private boolean bombtriggered = false;
+    private boolean run;
     private int rx;
 
     private int ry;
+    private int bombcount = 0;
+
 
     public chess(int rx, int ry){
         this.rx = rx;
         this.ry = ry;
+        new addimage();
+    }
+    public boolean isRun() {
+        return run;
     }
 
+    public void setRun(boolean run) {
+        this.run = run;
+    }
+
+    public int getBombcount() {
+        return bombcount;
+    }
+
+    public int getRx() {
+        return rx;
+    }
+
+    public int getRy() {
+        return ry;
+    }
+
+    public void setBombcount(int bombcount) {
+        this.bombcount = bombcount;
+    }
     public boolean isFlagged() {
         return flagged;
     }
@@ -61,21 +97,48 @@ public class chess extends Frame{
                 '}';
     }
 
+    public void cross(Graphics g,int x,int y){
+        Color c = g.getColor();
+        g.setColor(Color.red);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(3.0f));
+        g2.drawLine(x+4,y+4,x+WIDTH-4,y+HEIGHT-4);
+        g2.drawLine(x+WIDTH-4,y+4,x+4,y+HEIGHT-4);
+        g.setColor(c);
+    }
     public void render(Graphics g){
         //isrendered = g.drawImage(imgsafe,100,100,100,100,this);
-        if (pressed){
-            if (Bomb && bombtriggered){
-                //System.out.println("t");
-                g.drawImage(imgbombtrigerred,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
-            } else if (!bombtriggered && Bomb) {
-                g.drawImage(imgbomb,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
+        if (run) {
+            if (isPressed())
+                g.drawImage(imgsafei.get(bombcount),
+                        INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT,
+                        this);
+             else {
+                g.drawImage(imgnormal, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT,
+                        this);
+                if (isFlagged())
+                    g.drawImage(imgflag, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT,
+                            this);
+            }
+        }else {
+            if (isFlagged()) {
+                if (isBomb()){
+                    g.drawImage(imgbomb, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
+                    g.drawImage(imgflag, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);}
+                else {
+                    g.drawImage(imgbomb, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
+                    cross(g,INITX + WIDTH * rx, INITY + HEIGHT * ry);
+                }
+            } else if (bombtriggered) {
+                g.drawImage(imgbombtrigerred, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
+            } else if (isPressed()) {
+                if (isBomb()) {
+                    g.drawImage(imgbomb, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
+                } else
+                    g.drawImage(imgsafei.get(bombcount), INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
             } else
-                g.drawImage(imgsafe,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
+                g.drawImage(imgnormal, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
         }
-        else if (flagged) {
-            g.drawImage(imgflag,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
-        } else
-            g.drawImage(imgnormal,INITX+WIDTH*rx,INITY+HEIGHT*ry,WIDTH,HEIGHT,this);
     }
 
 }

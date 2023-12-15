@@ -11,7 +11,7 @@ import java.util.Random;
 public class launchFrame extends Frame implements MouseListener{
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
-    public static final int DIFFICULTY = 2;//改变难度(0-2)-1
+    public static final int DIFFICULTY = 0;//改变难度(0-2)-1
     int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
     private volatile boolean run;
     private boolean bombrun;
@@ -30,12 +30,12 @@ public class launchFrame extends Frame implements MouseListener{
         }
     }
     @Override
-    public void mouseClicked(MouseEvent e) throws IndexOutOfBoundsException{
+    public void mouseReleased(MouseEvent e) throws IndexOutOfBoundsException{
         //System.out.println("鼠标dianji");
         int rx = AbsToRe_X(e.getX());
         int ry = AbsToRe_Y(e.getY());
         Thread counter = new Thread(new time_Thread());
-        System.out.println(rx+"<----->"+ry);
+        //System.out.println(rx+"<----->"+ry);
         if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0){
             //雷生成器
             if (!bombrun){
@@ -52,8 +52,8 @@ public class launchFrame extends Frame implements MouseListener{
                     if (i>0) {
                         for (int j = i-1; j >= 0; j--) {
                             if ((xx[i] == xx[j] && yy[i] == yy[j]) || (xx[i]==rx && yy[i]==ry)) {
-                                System.out.println(xx[i] + "==" + xx[j]);
-                                System.out.println(yy[i] + "===" + yy[j]);
+                                //System.out.println(xx[i] + "==" + xx[j]);
+                                //System.out.println(yy[i] + "===" + yy[j]);
                                 isrepeat = true;
                             }
                         }
@@ -65,6 +65,25 @@ public class launchFrame extends Frame implements MouseListener{
                 }
                 for (int i = 0; i < diff[DIFFICULTY][2];i++){
                     chessX.get(xx[i]).get(yy[i]).setBomb(true);
+                }//激活雷,计算雷数量
+                for (List<chess> y : chessX){
+                    for (chess a : y){
+                        a.setRun(true);
+                        int ax = a.getRx();
+                        int ay = a.getRy();
+                        //System.out.println("===============\nrx=" + ax + "\nry=" + ay + "\n===================\n");
+                        for (int i = -1; i<=1 ;i++){
+                            for (int j = -1; j<=1;j++){
+                                if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
+                                        || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                                        || (i==ax && j == ay))
+                                    continue;
+                                if (chessX.get(ax+i).get(ay+j).isBomb()){
+                                    a.setBombcount(a.getBombcount()+1);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             //获取相对坐标
@@ -73,11 +92,12 @@ public class launchFrame extends Frame implements MouseListener{
             //左键单击：开雷
             if (e.getButton()==MouseEvent.BUTTON1 && !tempchess.isFlagged()){
                 if (e.getClickCount() >= 1) {
-                    if (tempchess.isBomb()) {
+                    if (tempchess.isBomb()) {//点到雷，炸了
                         //run = false;
                         tempchess.setBombtriggered(true);
                         for (List<chess> y : chessX){
                             for (chess a : y){
+                                a.setRun(false);
                                 if (a.isBomb()){
                                     a.setPressed(true);
                                 }
@@ -95,6 +115,19 @@ public class launchFrame extends Frame implements MouseListener{
                     }
                     else {
                         tempchess.setPressed(true);
+                        int ax = tempchess.getRx();
+                        int ay = tempchess.getRy();
+                        if (tempchess.getBombcount() == 0){
+                            for (int i = -1; i<=1 ;i++){
+                                for (int j = -1; j<=1;j++){
+                                    if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
+                                            || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                                            || (i==ax && j == ay))
+                                        continue;
+                                    chessX.get(ax+i).get(ay+j).setPressed(true);
+                                }
+                            }
+                        }
                     }
                 } else if (e.getClickCount() == 2 && tempchess.isPressed()) {
                     System.out.println("yes");
@@ -114,7 +147,7 @@ public class launchFrame extends Frame implements MouseListener{
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
+    public void mouseClicked(MouseEvent e) {
 
     }
 
