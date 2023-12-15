@@ -39,10 +39,6 @@ public class chess extends Frame{
         this.ry = ry;
         new addimage();
     }
-    public boolean isRun() {
-        return run;
-    }
-
     public void setRun(boolean run) {
         this.run = run;
     }
@@ -96,7 +92,6 @@ public class chess extends Frame{
                 ", y=" + ry +
                 '}';
     }
-
     public void cross(Graphics g,int x,int y){
         Color c = g.getColor();
         g.setColor(Color.red);
@@ -139,5 +134,4 @@ public class chess extends Frame{
                 g.drawImage(imgnormal, INITX + WIDTH * rx, INITY + HEIGHT * ry, WIDTH, HEIGHT, this);
         }
     }
-
 }
