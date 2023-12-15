@@ -11,7 +11,7 @@ import java.util.Random;
 public class launchFrame extends Frame implements MouseListener{
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
-    public static final int DIFFICULTY = 0;//改变难度(0-2)-1
+    public static final int DIFFICULTY = 2;//改变难度(0-2)-1
     int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
     private volatile boolean run;
     private boolean bombrun;
@@ -52,8 +52,6 @@ public class launchFrame extends Frame implements MouseListener{
                     if (i>0) {
                         for (int j = i-1; j >= 0; j--) {
                             if ((xx[i] == xx[j] && yy[i] == yy[j]) || (xx[i]==rx && yy[i]==ry)) {
-                                //System.out.println(xx[i] + "==" + xx[j]);
-                                //System.out.println(yy[i] + "===" + yy[j]);
                                 isrepeat = true;
                             }
                         }
@@ -71,7 +69,6 @@ public class launchFrame extends Frame implements MouseListener{
                         a.setRun(true);
                         int ax = a.getRx();
                         int ay = a.getRy();
-                        //System.out.println("===============\nrx=" + ax + "\nry=" + ay + "\n===================\n");
                         for (int i = -1; i<=1 ;i++){
                             for (int j = -1; j<=1;j++){
                                 if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
@@ -114,20 +111,7 @@ public class launchFrame extends Frame implements MouseListener{
                         reset();
                     }
                     else {
-                        tempchess.setPressed(true);
-                        int ax = tempchess.getRx();
-                        int ay = tempchess.getRy();
-                        if (tempchess.getBombcount() == 0){
-                            for (int i = -1; i<=1 ;i++){
-                                for (int j = -1; j<=1;j++){
-                                    if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
-                                            || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
-                                            || (i==ax && j == ay))
-                                        continue;
-                                    chessX.get(ax+i).get(ay+j).setPressed(true);
-                                }
-                            }
-                        }
+                        widen(tempchess);
                     }
                 } else if (e.getClickCount() == 2 && tempchess.isPressed()) {
                     System.out.println("yes");
@@ -159,6 +143,23 @@ public class launchFrame extends Frame implements MouseListener{
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    private void widen(chess a){
+        a.setPressed(true);
+        int ax = a.getRx();
+        int ay = a.getRy();
+        if (a.getBombcount() == 0){
+            for (int i = -1; i<=1 ;i++){
+                for (int j = -1; j<=1;j++){
+                    if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
+                            || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                            || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isPressed())
+                        continue;
+                    widen(chessX.get(ax+i).get(ay+j));
+                }
+            }
+        }
     }
 
     private int AbsToRe_X(int x){
