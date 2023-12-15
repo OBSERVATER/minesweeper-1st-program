@@ -15,11 +15,11 @@ public class chess extends Frame{
     Image imgflag = Toolkit.getDefaultToolkit().getImage("res/flag1.png");
     Image imgbomb = Toolkit.getDefaultToolkit().getImage("res/mine1.png");
     Image imgbombtrigerred = Toolkit.getDefaultToolkit().getImage("res/mine2.png");
-    public static final int DIFFICULTY = 2;//改变难度(0-2)-2
+    public static final int DIFFICULTY = 0;//改变难度(0-2)-2
 
     int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
-    public final int INITX = (int) (800/2-diff[DIFFICULTY][0]*12);
-    public final int INITY = (int) (600/2-diff[DIFFICULTY][1]*12);
+    public final int INITX =  (800/2-diff[DIFFICULTY][0]*12);
+    public final int INITY =  (600/2-diff[DIFFICULTY][1]*12);
     public static final int WIDTH = 24;
     public static final int HEIGHT = 24;
     private boolean Bomb;
@@ -28,9 +28,9 @@ public class chess extends Frame{
     private boolean flagged = false;
     private boolean bombtriggered = false;
     private boolean run;
-    private int rx;
+    private final int rx;
 
-    private int ry;
+    private final int ry;
     private int bombcount = 0;
 
 
@@ -107,7 +107,6 @@ public class chess extends Frame{
         g.setColor(c);
     }
     public void render(Graphics g){
-        //isrendered = g.drawImage(imgsafe,100,100,100,100,this);
         if (run) {
             if (isPressed())
                 g.drawImage(imgsafei.get(bombcount),
