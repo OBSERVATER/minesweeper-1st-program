@@ -7,21 +7,20 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class launchFrame extends Frame implements MouseListener{
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 600;
-    public static final int DIFFICULTY = 0;//改变难度(0-2)-1
+public class LaunchFrame extends Frame implements MouseListener{
+    public static final int WIDTH = 1024;
+    public static final int HEIGHT = 768;
     int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
     private volatile boolean run;
     private boolean bombrun;
-    public final int INITX =  (WIDTH/2-diff[DIFFICULTY][0]*12);
-    public final int INITY =  (HEIGHT/2-diff[DIFFICULTY][1]*12);
+
     Image icon = Toolkit.getDefaultToolkit().getImage("res/icon.png");
     private Image offscreenimage = null;
     int time = 0;
     int remaining_bomb;
-    List<List<chess>> chessX = new ArrayList<>();
+    List<List<chess>> chessX = new CopyOnWriteArrayList<>();
     public void generateChess(int[] diff){//传入diff数组的子元素
         for (int x = 0; x < diff[0]; x++){
             List<chess> chessY = new ArrayList<>();
@@ -37,21 +36,21 @@ public class launchFrame extends Frame implements MouseListener{
         int rx = AbsToRe_X(e.getX());
         int ry = AbsToRe_Y(e.getY());
         Thread counter = new Thread(new time_Thread());
-        //System.out.println(rx+"<----->"+ry);
+        System.out.println(rx+"<----->"+ry);
         if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0 &&
-                AbsToRe_X(e.getX())<diff[DIFFICULTY][0] && AbsToRe_Y(e.getY())<diff[DIFFICULTY][1]){
+                AbsToRe_X(e.getX())<diff[Setting.DIFFICULTY][0] && AbsToRe_Y(e.getY())<diff[Setting.DIFFICULTY][1]){
             //雷生成器
             if (!bombrun){
                 bombrun = true;
                 run = true;
                 counter.start();
-                int[] xx = new int[diff[DIFFICULTY][2]];
-                int[] yy = new int[diff[DIFFICULTY][2]];
+                int[] xx = new int[diff[Setting.DIFFICULTY][2]];
+                int[] yy = new int[diff[Setting.DIFFICULTY][2]];
                 Random random = new Random();
-                for (int i = 0; i < diff[DIFFICULTY][2]; i++){
+                for (int i = 0; i < diff[Setting.DIFFICULTY][2]; i++){
                     boolean isrepeat = false;
-                    xx[i]=random.nextInt(0,diff[DIFFICULTY][0]-1);
-                    yy[i]=random.nextInt(0,diff[DIFFICULTY][1]-1);
+                    xx[i]=random.nextInt(0,diff[Setting.DIFFICULTY][0]-1);
+                    yy[i]=random.nextInt(0,diff[Setting.DIFFICULTY][1]-1);
                     if (i>0) {
                         for (int j = i-1; j >= 0; j--) {
                             if ((xx[i] == xx[j] && yy[i] == yy[j]) || (xx[i] == rx && yy[i] == ry)) {
@@ -65,7 +64,7 @@ public class launchFrame extends Frame implements MouseListener{
                         //System.out.println("yes");
                     }
                 }
-                for (int i = 0; i < diff[DIFFICULTY][2];i++){
+                for (int i = 0; i < diff[Setting.DIFFICULTY][2]; i++){
                     chessX.get(xx[i]).get(yy[i]).setBomb(true);
                 }//激活雷,计算周围雷数量
                 for (List<chess> y : chessX){
@@ -75,8 +74,8 @@ public class launchFrame extends Frame implements MouseListener{
                         int ay = a.getRy();
                         for (int i = -1; i<=1 ;i++){
                             for (int j = -1; j<=1;j++){
-                                if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
-                                        || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                                if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
+                                        || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
                                         || (i==ax && j == ay))
                                     continue;
                                 if (chessX.get(ax+i).get(ay+j).isBomb()){
@@ -116,8 +115,8 @@ public class launchFrame extends Frame implements MouseListener{
                     if (local_bcount == tempchess.getBombcount()){
                         for (int i = -1; i<=1 ;i++){
                             for (int j = -1; j<=1;j++){
-                                if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
-                                        || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                                if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
+                                        || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
                                         || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isFlagged())
                                     continue;
                                 chess dc = chessX.get(ax+i).get(ay+j);
@@ -128,6 +127,7 @@ public class launchFrame extends Frame implements MouseListener{
                                     counter.interrupt();
                                     try {
                                         counter.join();
+                                        Thread.sleep(1000);
                                     } catch (InterruptedException ex) {
                                         throw new RuntimeException(ex);
                                     }
@@ -158,8 +158,8 @@ public class launchFrame extends Frame implements MouseListener{
         int ay = tempchess.getRy();
         for (int i = -1; i<=1 ;i++){
             for (int j = -1; j<=1;j++){
-                if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
-                        || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
+                        || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
                         || (i==ax && j == ay))
                     continue;
                 if (chessX.get(ax+i).get(ay+j).isFlagged()){
@@ -192,8 +192,8 @@ public class launchFrame extends Frame implements MouseListener{
         if (a.getBombcount() == 0 && !a.isBomb() ){
             for (int i = -1; i<=1 ;i++){
                 for (int j = -1; j<=1;j++){
-                    if (ax+i<0 || ax+i>diff[DIFFICULTY][0]-1
-                            || ay+j<0 || ay+j>diff[DIFFICULTY][1]-1
+                    if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
+                            || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
                             || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isPressed()
                             || chessX.get(ax+i).get(ay+j).isFlagged())
                         continue;
@@ -212,7 +212,7 @@ public class launchFrame extends Frame implements MouseListener{
             }
         }
         run = false;
-        JOptionPane.showMessageDialog(null,"You Lose.\nPress button to continue.",getTitle(),1);
+        JOptionPane.showMessageDialog(null,"You Lose.\nPress button to continue.",getTitle(), JOptionPane.INFORMATION_MESSAGE);
         reset();
     }
 
@@ -238,7 +238,7 @@ public class launchFrame extends Frame implements MouseListener{
             }
             JOptionPane.showMessageDialog(null,"You Win.\n" +
                     "Total time:"+time+"s" +
-                    "\nPress button to continue.",getTitle(),1);
+                    "\nPress button to continue.",getTitle(), JOptionPane.INFORMATION_MESSAGE);
             reset();
         }
     }
@@ -252,13 +252,15 @@ public class launchFrame extends Frame implements MouseListener{
                 }
             }
         }
-        this.remaining_bomb = diff[DIFFICULTY][2]-bcounter;
+        this.remaining_bomb = diff[Setting.DIFFICULTY][2]-bcounter;
     }
     private int AbsToRe_X(int x){
-        return (x-INITX)/24;
+        int INITX = (WIDTH/2-diff[Setting.DIFFICULTY][0]*16);
+        return (x-INITX)/32;
     }
     private int AbsToRe_Y(int y){
-        return (y-INITY)/24;
+        int INITY =  (HEIGHT/2-diff[Setting.DIFFICULTY][1]*16) + 30;
+        return (y-INITY)/32;
     }
     private class paint_Thread implements Runnable{
         public void run(){
@@ -288,7 +290,7 @@ public class launchFrame extends Frame implements MouseListener{
         chessX.clear();
         Thread render = new Thread(new paint_Thread());
         render.start();
-        generateChess(diff[DIFFICULTY]);
+        generateChess(diff[Setting.DIFFICULTY]);
         bombrun = false;
         run =false;
         time = 0;
@@ -325,16 +327,14 @@ public class launchFrame extends Frame implements MouseListener{
         g.setColor(Color.blue);
         Font font = new Font("Arial",Font.BOLD,20);
         g.setFont(font);
-        g.drawString("Time: " + this.time, INITX, 60);
-        g.drawString("Remaining Bomb: " + this.remaining_bomb, INITX, 90);
+        int INITX =  (WIDTH/2-diff[Setting.DIFFICULTY][0]*16);
+        g.drawString("Time: " + (run ? this.time : 0), INITX, 90);
+        g.drawString("Remaining Bomb: " + this.remaining_bomb, INITX, 120);
         for (List<chess> y : chessX){
             for (chess a : y){
                 a.render(g);
             }
         }
     }
-    public static void main(String[] args) {
-        launchFrame lr = new launchFrame();
-        lr.win();
-    }
+
 }
