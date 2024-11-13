@@ -16,9 +16,8 @@ public class chess extends Frame{
     Image imgbomb = Toolkit.getDefaultToolkit().getImage("res/mine1.png");
     Image imgbombtrigerred = Toolkit.getDefaultToolkit().getImage("res/mine2.png");
 
-    int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
-    public final int INITX =  (1024/2-diff[Setting.DIFFICULTY][0]*16);
-    public final int INITY =  (768/2-diff[Setting.DIFFICULTY][1]*16) + 30;
+    public final int INITX = 1280/2-Init.diff[Setting.DIFFICULTY][0]*16;
+    public final int INITY =  960/2-Init.diff[Setting.DIFFICULTY][1]*16;
     public static final int WIDTH = 32;
     public static final int HEIGHT = 32;
     private boolean Bomb;

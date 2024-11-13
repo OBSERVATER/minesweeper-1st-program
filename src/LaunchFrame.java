@@ -10,9 +10,8 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class LaunchFrame extends Frame implements MouseListener{
-    public static final int WIDTH = 1024;
-    public static final int HEIGHT = 768;
-    int[][] diff = {{9,9,10},{16,16,40},{30,16,99}};
+    public static final int WIDTH = 1280;
+    public static final int HEIGHT = 960;
     private volatile boolean run;
     private boolean bombrun;
 
@@ -36,21 +35,22 @@ public class LaunchFrame extends Frame implements MouseListener{
         int rx = AbsToRe_X(e.getX());
         int ry = AbsToRe_Y(e.getY());
         Thread counter = new Thread(new time_Thread());
-        System.out.println(rx+"<----->"+ry);
+        //System.out.println(rx+"<----->"+ry);
         if (AbsToRe_X(e.getX())>=0 && AbsToRe_Y(e.getY())>=0 &&
-                AbsToRe_X(e.getX())<diff[Setting.DIFFICULTY][0] && AbsToRe_Y(e.getY())<diff[Setting.DIFFICULTY][1]){
+                AbsToRe_X(e.getX())<Init.diff[Setting.DIFFICULTY][0] && AbsToRe_Y(e.getY())<Init.diff[Setting.DIFFICULTY][1]){
             //雷生成器
             if (!bombrun){
                 bombrun = true;
                 run = true;
+                System.out.println(Init.diff[Setting.DIFFICULTY][2]);
                 counter.start();
-                int[] xx = new int[diff[Setting.DIFFICULTY][2]];
-                int[] yy = new int[diff[Setting.DIFFICULTY][2]];
+                int[] xx = new int[Init.diff[Setting.DIFFICULTY][2]];
+                int[] yy = new int[Init.diff[Setting.DIFFICULTY][2]];
                 Random random = new Random();
-                for (int i = 0; i < diff[Setting.DIFFICULTY][2]; i++){
+                for (int i = 0; i < Init.diff[Setting.DIFFICULTY][2]; i++){
                     boolean isrepeat = false;
-                    xx[i]=random.nextInt(0,diff[Setting.DIFFICULTY][0]-1);
-                    yy[i]=random.nextInt(0,diff[Setting.DIFFICULTY][1]-1);
+                    xx[i]=random.nextInt(0,Init.diff[Setting.DIFFICULTY][0]);
+                    yy[i]=random.nextInt(0,Init.diff[Setting.DIFFICULTY][1]);
                     if (i>0) {
                         for (int j = i-1; j >= 0; j--) {
                             if ((xx[i] == xx[j] && yy[i] == yy[j]) || (xx[i] == rx && yy[i] == ry)) {
@@ -64,7 +64,7 @@ public class LaunchFrame extends Frame implements MouseListener{
                         //System.out.println("yes");
                     }
                 }
-                for (int i = 0; i < diff[Setting.DIFFICULTY][2]; i++){
+                for (int i = 0; i < Init.diff[Setting.DIFFICULTY][2]; i++){
                     chessX.get(xx[i]).get(yy[i]).setBomb(true);
                 }//激活雷,计算周围雷数量
                 for (List<chess> y : chessX){
@@ -74,8 +74,8 @@ public class LaunchFrame extends Frame implements MouseListener{
                         int ay = a.getRy();
                         for (int i = -1; i<=1 ;i++){
                             for (int j = -1; j<=1;j++){
-                                if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
-                                        || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
+                                if (ax+i<0 || ax+i>Init.diff[Setting.DIFFICULTY][0]-1
+                                        || ay+j<0 || ay+j>Init.diff[Setting.DIFFICULTY][1]-1
                                         || (i==ax && j == ay))
                                     continue;
                                 if (chessX.get(ax+i).get(ay+j).isBomb()){
@@ -115,8 +115,8 @@ public class LaunchFrame extends Frame implements MouseListener{
                     if (local_bcount == tempchess.getBombcount()){
                         for (int i = -1; i<=1 ;i++){
                             for (int j = -1; j<=1;j++){
-                                if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
-                                        || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
+                                if (ax+i<0 || ax+i>Init.diff[Setting.DIFFICULTY][0]-1
+                                        || ay+j<0 || ay+j>Init.diff[Setting.DIFFICULTY][1]-1
                                         || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isFlagged())
                                     continue;
                                 chess dc = chessX.get(ax+i).get(ay+j);
@@ -158,8 +158,8 @@ public class LaunchFrame extends Frame implements MouseListener{
         int ay = tempchess.getRy();
         for (int i = -1; i<=1 ;i++){
             for (int j = -1; j<=1;j++){
-                if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
-                        || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
+                if (ax+i<0 || ax+i>Init.diff[Setting.DIFFICULTY][0]-1
+                        || ay+j<0 || ay+j>Init.diff[Setting.DIFFICULTY][1]-1
                         || (i==ax && j == ay))
                     continue;
                 if (chessX.get(ax+i).get(ay+j).isFlagged()){
@@ -192,8 +192,8 @@ public class LaunchFrame extends Frame implements MouseListener{
         if (a.getBombcount() == 0 && !a.isBomb() ){
             for (int i = -1; i<=1 ;i++){
                 for (int j = -1; j<=1;j++){
-                    if (ax+i<0 || ax+i>diff[Setting.DIFFICULTY][0]-1
-                            || ay+j<0 || ay+j>diff[Setting.DIFFICULTY][1]-1
+                    if (ax+i<0 || ax+i>Init.diff[Setting.DIFFICULTY][0]-1
+                            || ay+j<0 || ay+j>Init.diff[Setting.DIFFICULTY][1]-1
                             || (i==ax && j == ay) || chessX.get(ax+i).get(ay+j).isPressed()
                             || chessX.get(ax+i).get(ay+j).isFlagged())
                         continue;
@@ -252,14 +252,14 @@ public class LaunchFrame extends Frame implements MouseListener{
                 }
             }
         }
-        this.remaining_bomb = diff[Setting.DIFFICULTY][2]-bcounter;
+        this.remaining_bomb = Init.diff[Setting.DIFFICULTY][2]-bcounter;
     }
     private int AbsToRe_X(int x){
-        int INITX = (WIDTH/2-diff[Setting.DIFFICULTY][0]*16);
+        int INITX = (WIDTH/2-Init.diff[Setting.DIFFICULTY][0]*16);
         return (x-INITX)/32;
     }
     private int AbsToRe_Y(int y){
-        int INITY =  (HEIGHT/2-diff[Setting.DIFFICULTY][1]*16) + 30;
+        int INITY =  (HEIGHT/2-Init.diff[Setting.DIFFICULTY][1]*16);
         return (y-INITY)/32;
     }
     private class paint_Thread implements Runnable{
@@ -290,7 +290,7 @@ public class LaunchFrame extends Frame implements MouseListener{
         chessX.clear();
         Thread render = new Thread(new paint_Thread());
         render.start();
-        generateChess(diff[Setting.DIFFICULTY]);
+        generateChess(Init.diff[Setting.DIFFICULTY]);
         bombrun = false;
         run =false;
         time = 0;
@@ -306,7 +306,6 @@ public class LaunchFrame extends Frame implements MouseListener{
         setLocationRelativeTo(null);
         setTitle("Minecraft");
         setVisible(true);
-        setResizable(false);
         setIconImage(icon);
         addMouseListener(this);
         reset();
@@ -327,7 +326,7 @@ public class LaunchFrame extends Frame implements MouseListener{
         g.setColor(Color.blue);
         Font font = new Font("Arial",Font.BOLD,20);
         g.setFont(font);
-        int INITX =  (WIDTH/2-diff[Setting.DIFFICULTY][0]*16);
+        int INITX =  (WIDTH/2-Init.diff[Setting.DIFFICULTY][0]*16);
         g.drawString("Time: " + (run ? this.time : 0), INITX, 90);
         g.drawString("Remaining Bomb: " + this.remaining_bomb, INITX, 120);
         for (List<chess> y : chessX){
